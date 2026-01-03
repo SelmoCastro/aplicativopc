@@ -4,39 +4,45 @@ import os
 class SoftwareInstaller:
     # Categories and popular software with their Winget IDs
     SOFTWARE_CATALOG = {
-        "Navegadores": {
+        "Essenciais (Pós-Format)": {
             "Google Chrome": "Google.Chrome",
             "Mozilla Firefox": "Mozilla.Firefox",
-            "Brave Browser": "Brave.Brave",
-            "Opera GX": "Opera.OperaGX"
-        },
-        "Comunicação": {
-            "Discord": "Discord.Discord",
-            "WhatsApp": "WhatsApp.WhatsApp",
-            "Telegram": "Telegram.TelegramDesktop",
-            "Zoom": "Zoom.Zoom"
-        },
-        "Ferramentas / Utilitários": {
-            "7-Zip": "7zip.7zip",
             "WinRAR": "RARLab.WinRAR",
-            "PowerToys": "Microsoft.PowerToys",
-            "Notepad++": "Notepad++.Notepad++",
-            "AnyDesk": "AnyDeskSoftwareGmbH.AnyDesk"
-        },
-        "Mídia": {
+            "7-Zip": "7zip.7zip",
             "VLC Media Player": "VideoLAN.VLC",
+            "WhatsApp": "WhatsApp.WhatsApp",
+        },
+        "Runtimes & Sistema": {
+            "Visual C++ Redist. 2015-2022": "Microsoft.VCRedist.2015+.x64",
+            ".NET Desktop Runtime 8": "Microsoft.DotNet.DesktopRuntime.8",
+            "DirectX (End-User Runtime)": "Microsoft.DirectX",
+            "Java Runtime (JRE)": "Oracle.JavaRuntimeEnvironment",
+        },
+        "Utilitários & Office": {
+            "Adobe Acrobat Reader": "Adobe.Acrobat.Reader.64-bit",
+            "AnyDesk": "AnyDeskSoftwareGmbH.AnyDesk",
+            "Notepad++": "Notepad++.Notepad++",
+            "qBittorrent": "qBittorrent.qBittorrent",
+            "PowerToys": "Microsoft.PowerToys",
+            "LibreOffice": "TheDocumentFoundation.LibreOffice",
+        },
+        "Mídia & Design": {
             "Spotify": "Spotify.Spotify",
-            "OBS Studio": "OBSProject.OBSStudio"
+            "OBS Studio": "OBSProject.OBSStudio",
+            "GIMP": "GIMP.GIMP",
+            "Audacity": "Audacity.Audacity",
+        },
+        "Gaming": {
+            "Steam": "Valve.Steam",
+            "Epic Games Launcher": "EpicGames.EpicGamesLauncher",
+            "Discord": "Discord.Discord",
+            "MSI Afterburner": "Guru3D.Afterburner",
         },
         "Desenvolvimento": {
             "VS Code": "Microsoft.VisualStudioCode",
             "Python 3.12": "Python.Python.3.12",
             "Git": "Git.Git",
             "Node.js (LTS)": "OpenJS.NodeJS.LTS"
-        },
-        "Gaming": {
-            "Steam": "Valve.Steam",
-            "Epic Games Launcher": "EpicGames.EpicGamesLauncher"
         }
     }
 

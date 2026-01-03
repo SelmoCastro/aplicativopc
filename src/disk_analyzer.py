@@ -41,37 +41,58 @@ class DiskAnalyzer:
         if not os.path.exists(root_path):
             return []
 
+        # List of system folders to ignore (only when scanning root C: or similar)
+        # Using uppercase for case-insensitive check
+        EXCLUDED_FOLDERS = [
+            "WINDOWS", "PROGRAM FILES", "PROGRAM FILES (X86)", 
+            "PROGRAMDATA", "SYSTEM VOLUME INFORMATION", "$RECYCLE.BIN", "RECOVERY",
+            "HIBERFIL.SYS", "PAGEFILE.SYS", "SWAPFILE.SYS",
+            "DOCUMENTS AND SETTINGS", "PERFLOGS", "MSOCACHE",
+            "APPDATA", "LOCAL SETTINGS", "APPLICATION DATA" # Hiding AppData to focus on User Content
+        ]
+
         try:
             # List immediate children
             items = os.listdir(root_path)
             
             for item in items:
+                # Check exclusion (only if scanning a root-like drive, or we can just always exclude common system names)
+                # To be compliant with user request "not list system folders", we apply this filter globally 
+                # or specifically check if root_path is C:\
+                
+                if item.upper() in EXCLUDED_FOLDERS:
+                    continue
+                    
                 item_path = os.path.join(root_path, item)
                 
                 if os.path.isdir(item_path):
                     size = self.get_folder_size(item_path)
+                    mtime = os.path.getmtime(item_path)
                     results.append({
                         'name': item,
                         'path': item_path,
                         'size': size,
                         'size_str': self.format_bytes(size),
-                        'type': 'folder'
+                        'type': 'folder',
+                        'mtime': mtime
                     })
                 else:
                     # It's a file
                     try:
                         size = os.path.getsize(item_path)
+                        mtime = os.path.getmtime(item_path)
                         results.append({
                             'name': item,
                             'path': item_path,
                             'size': size,
                             'size_str': self.format_bytes(size),
-                            'type': 'file'
+                            'type': 'file',
+                            'mtime': mtime
                         })
                     except:
                         pass
             
-            # Sort by size (descending)
+            # Default Sort by size (descending)
             results.sort(key=lambda x: x['size'], reverse=True)
             
         except Exception as e:

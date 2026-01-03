@@ -59,9 +59,23 @@ class TweaksFrame(ctk.CTkFrame):
         ctk.CTkButton(priv_frame, text="Desativar Telemetria e Bing Search", fg_color="#d63031", hover_color="#c0392b",
                       command=lambda: self.run_tweak(self.tweaks.remove_telemetry)
                       ).pack(pady=10, padx=40, fill="x")
+
+        # --- Appearance Section ---
+        theme_frame = ctk.CTkFrame(self)
+        theme_frame.grid(row=3, column=0, columnspan=2, sticky="ew", padx=10, pady=10)
+        
+        ctk.CTkLabel(theme_frame, text="🎨 Aparência", font=ctk.CTkFont(size=16, weight="bold")).pack(pady=10)
+        
+        btn_row = ctk.CTkFrame(theme_frame, fg_color="transparent")
+        btn_row.pack(pady=10)
+        
+        ctk.CTkButton(btn_row, text="Escuro (Dark)", width=100, command=lambda: ctk.set_appearance_mode("Dark")).pack(side="left", padx=10)
+        ctk.CTkButton(btn_row, text="Claro (Light)", width=100, command=lambda: ctk.set_appearance_mode("Light")).pack(side="left", padx=10)
+        ctk.CTkButton(btn_row, text="Sistema", width=100, command=lambda: ctk.set_appearance_mode("System")).pack(side="left", padx=10)
+
     
         self.status_label = ctk.CTkLabel(self, text="", font=ctk.CTkFont(weight="bold"))
-        self.status_label.grid(row=3, column=0, columnspan=2, pady=20)
+        self.status_label.grid(row=4, column=0, columnspan=2, pady=20)
 
     def run_tweak(self, func):
         self.status_label.configure(text="Aplicando...", text_color="yellow")

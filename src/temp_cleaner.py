@@ -74,7 +74,15 @@ class TempCleaner:
         if not os.path.exists(folder_path):
             return 0, 0
 
-        for item in os.listdir(folder_path):
+        try:
+            # Try to list directory, if permission denied, just return error
+            items = os.listdir(folder_path)
+        except PermissionError:
+            return 0, 1 # 1 Error (Access Denied)
+        except Exception:
+            return 0, 1
+
+        for item in items:
             item_path = os.path.join(folder_path, item)
             try:
                 if os.path.isfile(item_path) or os.path.islink(item_path):

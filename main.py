@@ -14,6 +14,9 @@ from src.ui.startup_frame import StartupFrame
 from src.ui.temp_clean_frame import TempCleanFrame
 from src.ui.dashboard_frame import DashboardFrame
 from src.ui.game_frame import GameModeFrame
+from src.config_manager import ConfigManager
+from src.automation_service import AutomationService
+
 # Configure appearance
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
@@ -28,6 +31,11 @@ class App(ctk.CTk):
         # Grid layout
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
+        
+        # Services
+        self.app_config = ConfigManager()
+        self.automation = AutomationService(self.app_config)
+        self.automation.start()
 
         # Sidebar
         self.sidebar = ctk.CTkFrame(self, width=200, corner_radius=0)
@@ -80,9 +88,10 @@ class App(ctk.CTk):
         # Initialize Frames
         # Note: We pass 'self.restart_as_admin' to ProcessFrame so it can call it
         self.dash_frame = DashboardFrame(self.main_area, nav_callback=self.show_frame_by_name)
-        self.ram_frame = RamFrame(self.main_area)
+        self.ram_frame = RamFrame(self.main_area, config_manager=self.app_config)
         self.scan_frame = ScanFrame(self.main_area)
         self.apps_frame = AppsFrame(self.main_area)
+
         # Fix: ProcessFrame constructor expects 'restart_callback'
         self.proc_frame = ProcessFrame(self.main_area, restart_callback=self.restart_as_admin)
         self.inst_frame = InstallerFrame(self.main_area)
@@ -162,6 +171,32 @@ class App(ctk.CTk):
         except Exception as e:
             messagebox.showerror("Erro", f"Falha ao reiniciar como admin: {e}")
 
+
+    def on_closing(self):
+        self.automation.stop()
+        self.destroy()
+
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
+
 if __name__ == "__main__":
+    if not is_admin():
+        # Re-run the program with admin rights
+        try:
+            # SW_SHOWMINIMIZED = 2
+            # Use '1' (Normal) if you want to see the console for debugging
+            # Using '0' (Hide) avoids the extra window popping up
+            ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 0)
+        except Exception as e:
+            print(f"Error starting as admin: {e}")
+        # Exit the non-admin instance
+        sys.exit()
+        
     app = App()
+
+    app.protocol("WM_DELETE_WINDOW", app.on_closing)
     app.mainloop()
+

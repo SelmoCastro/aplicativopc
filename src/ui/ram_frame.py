@@ -4,8 +4,9 @@ import time
 from src.ram_cleaner import RamCleaner
 
 class RamFrame(ctk.CTkFrame):
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, config_manager=None, **kwargs):
         super().__init__(master, **kwargs)
+        self.config = config_manager
         
         self.grid_columnconfigure(0, weight=1)
         
@@ -22,13 +23,45 @@ class RamFrame(ctk.CTkFrame):
         self.clean_btn = ctk.CTkButton(self, text="OTIMIZAR RAM AGORA", height=50, 
                                        font=ctk.CTkFont(size=16, weight="bold"), 
                                        command=self.clean_ram_action)
-        self.clean_btn.grid(row=3, column=0, pady=40)
+        self.clean_btn.grid(row=3, column=0, pady=30)
         
         self.clean_status = ctk.CTkLabel(self, text="", text_color="green")
-        self.clean_status.grid(row=4, column=0, pady=10)
-        
+        self.clean_status.grid(row=4, column=0, pady=5)
+
+        # --- Automation Section ---
+        if self.config:
+            auto_frame = ctk.CTkFrame(self, fg_color=("gray85", "gray25"))
+            auto_frame.grid(row=5, column=0, pady=20, padx=20, sticky="ew")
+            auto_frame.grid_columnconfigure(1, weight=1)
+            
+            ctk.CTkLabel(auto_frame, text="Automação Inteligente", font=ctk.CTkFont(weight="bold")).grid(row=0, column=0, columnspan=2, pady=10)
+            
+            # Toggle
+            self.auto_var = ctk.BooleanVar(value=self.config.get("auto_ram_clean"))
+            self.auto_chk = ctk.CTkSwitch(auto_frame, text="Limpeza Automática", variable=self.auto_var, command=self.save_auto_settings)
+            self.auto_chk.grid(row=1, column=0, padx=20, pady=10, sticky="w")
+            
+            # Slider
+            self.thresh_lbl = ctk.CTkLabel(auto_frame, text=f"Limpar quando > {self.config.get('ram_threshold')}%")
+            self.thresh_lbl.grid(row=1, column=1, sticky="e", padx=20)
+            
+            self.thresh_slider = ctk.CTkSlider(auto_frame, from_=50, to=95, number_of_steps=45, command=self.update_slider_label)
+            self.thresh_slider.set(self.config.get("ram_threshold"))
+            self.thresh_slider.grid(row=2, column=0, columnspan=2, padx=20, pady=10, sticky="ew")
+            
+            # Bind release event manually if needed, usually 'command' covers drag
+            self.thresh_slider.bind("<ButtonRelease-1>", lambda event: self.save_auto_settings())
+
         # Start monitoring loop
         self.update_ram_loop()
+
+    def update_slider_label(self, value):
+        self.thresh_lbl.configure(text=f"Limpar quando > {int(value)}%")
+
+    def save_auto_settings(self):
+        if self.config:
+            self.config.set("auto_ram_clean", self.auto_var.get())
+            self.config.set("ram_threshold", int(self.thresh_slider.get()))
 
     def update_ram_loop(self):
         try:
@@ -63,3 +96,4 @@ class RamFrame(ctk.CTkFrame):
     def _finish_clean(self, msg):
         self.clean_status.configure(text=msg, text_color="green")
         self.clean_btn.configure(state="normal")
+
